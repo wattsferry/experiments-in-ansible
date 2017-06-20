@@ -36,7 +36,7 @@
           Service: "MarkLogic"
           Group: "PIKM"
           Contact: "{{ contact_name }}"
-          Name: "{{ node_name }}"
+          Name: "ansibleTestML"
           UserId: "{{ username }}"
         count_tag:
           Service: "MarkLogic"
