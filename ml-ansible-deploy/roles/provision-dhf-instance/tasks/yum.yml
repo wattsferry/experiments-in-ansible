@@ -1,4 +1,5 @@
 - name: "Install yum packages"
+  hosts: tag_Name_ansibleTestML
   yum: pkg={{item}} state=installed
   with_items:
     - nano
