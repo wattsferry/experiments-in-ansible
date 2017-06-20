@@ -1,7 +1,5 @@
 ---
 
-- include: yum.yml
-
 - name: "Provision EC2 instance"
   ec2:
     key_name: "TestML"
@@ -22,6 +20,13 @@
       volume_size: "10"
       iops: 150
       delete_on_termination: true
+    user_data: |
+      #!/bin/bash
+      yumInstalls() {
+        yum install -y java-1.8.0 nano nmap ruby
+        echo 2 | /usr/sbin/alternatives --config java
+      }
+      yumInstalls
     instance_tags:
       Service: "MarkLogic"
       Group: "PIKM"
