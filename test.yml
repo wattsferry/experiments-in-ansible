@@ -1,0 +1,68 @@
+---
+- name: Spin up single ML node
+  hosts: localhost
+  connection: local
+  vars:
+    instance_type: "t2.large"
+    marklogic_image: "ami-b63769a1"
+    region: "us-east-1"
+    vpc_subnet_id: "subnet-5678256b" 
+    volume_size: 10
+    contact_name: "Clay Redding"
+    username: "ec2-user"
+    email_address: "clay.redding@marklogic.com"
+  tasks:
+    - name: Provision EC2 instance
+      ec2:
+        key_name: "TestML"
+        group: "ml9-launch-wizard-1"
+        instance_type: "{{ instance_type }}"
+        image: "{{ marklogic_image }}"
+        wait: true
+        region: "{{ region }}"
+        monitoring: yes
+        vpc_subnet_id: "{{ vpc_subnet_id }}"
+        volumes:
+          - device_name: /dev/xvda
+            volume_type: gp2
+            volume_size: 8
+            delete_on_termination: true
+          - device_name: /dev/xvdf
+            volume_type: io1
+            volume_size: "{{ volume_size }}"
+            iops: 150
+            delete_on_termination: true
+        instance_tags:
+          Service: "MarkLogic"
+          Group: "PIKM"
+          Contact: "{{ contact_name }}"
+          Name: "{{ node_name }}"
+          UserId: "{{ username }}"
+        count_tag:
+          Service: "MarkLogic"
+          Name: "{{ node_name }}"
+        exact_count: 1
+      register: ec2
+    - debug: "msg='Admin Console: http://{{ ec2.instances[0].private_ip }}:8001, Username: admin, Password: {{ ec2.instances[0].id }}'"
+      when: ec2.changed
+    - name: Add all instance public IPs to host group
+      add_host: hostname={{ item.public_ip }} groups=ec2hosts
+      with_items: "{{ ec2.instances }}"
+
+#- hosts: ec2hosts
+#  name: configuration play
+#  user: ec2-user
+#  become_user: root
+#  gather_facts: true
+
+#  tasks:
+#
+#   - name: Check NTP service
+#     service: name=ntpd state=started
+       
+#    - name: install the latest version of nano
+#      yum: name=nano state=latest
+#    - name: install the latest version of nmap
+#      yum: name=nmap state=latest
+#    - name: install the latest version of ruby
+#      yum: name=ruby state=latest
