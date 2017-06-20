@@ -1,0 +1,6 @@
+- name: "Install yum packages"
+  yum: pkg={{item}} state=installed
+  with_items:
+    - nano
+    - ruby
+    - nmap

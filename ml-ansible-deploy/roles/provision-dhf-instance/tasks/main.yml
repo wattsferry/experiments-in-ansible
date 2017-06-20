@@ -1,4 +1,7 @@
 ---
+
+- include: yum.yml
+
 - name: "Provision EC2 instance"
   ec2:
     key_name: "TestML"
