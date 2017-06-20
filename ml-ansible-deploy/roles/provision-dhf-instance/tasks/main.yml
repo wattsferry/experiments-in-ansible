@@ -23,7 +23,7 @@
       Service: "MarkLogic"
       Group: "PIKM"
       Contact: "clay.redding@marklogic.com"
-      Name: "ansibleMLTest"
+      Name: "{{node_name}}"
       UserId: "ec2-user"
     count_tag:
       Service: "MarkLogic"
