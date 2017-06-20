@@ -26,7 +26,18 @@
         yum install -y java-1.8.0 nano nmap ruby
         echo 2 | /usr/sbin/alternatives --config java
       }
+      optimizeOS() {
+        # setting should be noop
+        echo noop | tee /sys/block/xvdf/queue/scheduler
+        # setting should be never
+        cat /sys/kernel/mm/transparent_hugepage/defrag
+        # setting should be never
+        cat /sys/kernel/mm/transparent_hugepage/enabled
+        echo "vm.nr_hugepages=12288" /etc/sysctl.conf
+        echo "vm.swappiness=0" /etc/sysctl.conf
+      }
       yumInstalls
+      optimizeOS
     instance_tags:
       Service: "MarkLogic"
       Group: "PIKM"
