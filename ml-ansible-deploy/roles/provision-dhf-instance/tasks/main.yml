@@ -1,0 +1,37 @@
+---
+- name: "Provision EC2 instance"
+  ec2:
+    key_name: "TestML"
+    group: "ml9-launch-wizard-1"
+    instance_type: "t2.large"
+    image: "ami-b63769a1"
+    wait: true
+    region: "us-east-1"
+    monitoring: true
+    vpc_subnet_id: "subnet-5678256b"
+    volumes:
+    - device_name: /dev/xvda
+      volume_type: gp2
+      volume_size: 8
+      delete_on_termination: true
+    - device_name: /dev/xvdf
+      volume_type: io1
+      volume_size: "10"
+      iops: 150
+      delete_on_termination: true
+    instance_tags:
+      Service: "MarkLogic"
+      Group: "PIKM"
+      Contact: "clay.redding@marklogic.com"
+      Name: "ansibleMLTest"
+      UserId: "ec2-user"
+    count_tag:
+      Service: "MarkLogic"
+      Name: "ansibleMLTest"
+    exact_count: 1
+  register: ec2
+- debug: "msg='Admin Console: http://{{ ec2.instances[0].private_ip }}:8001, Username: admin, Password: {{ ec2.instances[0].id }}'"
+  when: ec2.changed
+- name: Add all instance public IPs to host group
+  add_host: hostname={{ item.public_ip }} groups=ec2hosts
+  with_items: "{{ ec2.instances }}"
